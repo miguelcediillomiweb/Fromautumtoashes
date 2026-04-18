@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reproductor Elegante</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            font-family: 'Segoe UI', sans-serif;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Capa del Telón Negro */
+        #telon {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            transition: transform 1.5s cubic-bezier(0.7, 0, 0.3, 1);
+        }
+
+        /* Botón del Telón */
+        #btn-inicio {
+            padding: 20px 40px;
+            font-size: 1.2rem;
+            color: #fff;
+            background: transparent;
+            border: 2px solid #fff;
+            cursor: pointer;
+            transition: 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        #btn-inicio:hover {
+            background: #fff;
+            color: #000;
+        }
+
+        /* Contenido Principal */
+        #escenario {
+            text-align: center;
+            visibility: hidden;
+        }
+
+        /* Estilo del Disco (Imagen del CD) */
+        .disco-wrapper {
+            position: relative;
+            width: 350px;
+            height: 350px;
+        }
+
+        #imagen-cd {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            box-shadow: 0 0 50px rgba(255,255,255,0.1);
+            /* Animación de giro */
+            animation: girar 8s linear infinite;
+            animation-play-state: paused;
+        }
+
+        /* El hoyito central del CD */
+        .disco-wrapper::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            background: #000;
+            border-radius: 50%;
+            box-shadow: inset 0 0 10px #333;
+        }
+
+        @keyframes girar {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Botón de Escuchar Aquí */
+        #btn-escuchar {
+            margin-top: 30px;
+            padding: 15px 30px;
+            font-size: 1rem;
+            background-color: #fff;
+            color: #000;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* Ocultar el video de YouTube */
+        #video-container {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="telon">
+        <button id="btn-inicio">Si te quedarás a escuchar toda la canción da click aqui</button>
+    </div>
+
+    <div id="escenario">
+        <div class="disco-wrapper">
+            <img src="https://i.ibb.co/ycKZ0PTF/images-2026-04-17-T232653-141.jpg" id="imagen-cd" alt="Disco CD">
+        </div>
+        <button id="btn-escuchar">ESCUCHAR AQUÍ</button>
+    </div>
+
+    <div id="video-container">
+        <div id="player"></div>
+    </div>
+
+    <script>
+        // Cargar el API de YouTube
+        var tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        var player;
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('player', {
+                height: '0',
+                width: '0',
+                videoId: 'XQVGRJyFtRI', // ID de tu canción
+                events: {
+                    'onStateChange': onPlayerStateChange
+                }
+            });
+        }
+
+        const telon = document.getElementById('telon');
+        const btnInicio = document.getElementById('btn-inicio');
+        const escenario = document.getElementById('escenario');
+        const btnEscuchar = document.getElementById('btn-escuchar');
+        const disco = document.getElementById('imagen-cd');
+
+        // Acción al presionar el telón
+        btnInicio.addEventListener('click', () => {
+            telon.style.transform = 'translateY(-100%)'; // Abre el telón hacia arriba
+            escenario.style.visibility = 'visible';
+        });
+
+        // Acción al presionar Escuchar Aquí
+        btnEscuchar.addEventListener('click', () => {
+            player.playVideo();
+            btnEscuchar.style.display = 'none'; // Oculta el botón después de iniciar
+        });
+
+        // Control de la animación según la música
+        function onPlayerStateChange(event) {
+            if (event.data == YT.PlayerState.PLAYING) {
+                disco.style.animationPlayState = 'running';
+            } else {
+                disco.style.animationPlayState = 'paused';
+            }
+        }
+    </script>
+</body>
+</html>
